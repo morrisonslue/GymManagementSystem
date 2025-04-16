@@ -5,6 +5,8 @@ import org.keyin.user.User;
 import org.keyin.user.UserService;
 import org.keyin.workoutclasses.WorkoutClassService;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class GymApp {
@@ -12,6 +14,7 @@ public class GymApp {
         UserService userService = new UserService();
         MembershipService membershipService = new MembershipService();
         WorkoutClassService workoutService = new WorkoutClassService();
+
         Scanner scanner = new Scanner(System.in);
         int choice;
 
@@ -23,12 +26,12 @@ public class GymApp {
             System.out.print("Enter your choice: ");
 
             while (!scanner.hasNextInt()) {
-                System.out.println("Invalid input. Enter a number: ");
+                System.out.println("Invalid input! Please enter a number.");
                 scanner.next();
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // consume newline
 
             switch (choice) {
                 case 1:
@@ -38,106 +41,110 @@ public class GymApp {
                     logInAsUser(scanner, userService, membershipService, workoutService);
                     break;
                 case 3:
-                    System.out.println("Exiting program...");
+                    System.out.println("Goodbye!");
                     break;
                 default:
-                    System.out.println("Invalid choice");
+                    System.out.println("Invalid option.");
             }
-
         } while (choice != 3);
 
         scanner.close();
     }
 
     private static void addNewUser(Scanner scanner, UserService userService) {
-        System.out.print("Enter username: ");
+        System.out.print("Username: ");
         String username = scanner.nextLine();
-
-        System.out.print("Enter password: ");
+        System.out.print("Password: ");
         String password = scanner.nextLine();
-
-        System.out.print("Enter role (Admin/Trainer/Member): ");
+        System.out.print("Role (Admin/Trainer/Member): ");
         String role = scanner.nextLine();
-
-        System.out.print("Enter email: ");
+        System.out.print("Email: ");
         String email = scanner.nextLine();
-
-        System.out.print("Enter phone number: ");
-        String phoneNumber = scanner.nextLine();
-
-        System.out.print("Enter address: ");
+        System.out.print("Phone: ");
+        String phone = scanner.nextLine();
+        System.out.print("Address: ");
         String address = scanner.nextLine();
 
-        boolean success = userService.registerUser(username, password, role, email, phoneNumber, address);
+        boolean success = userService.registerUser(username, password, role, email, phone, address);
 
         if (success) {
-            System.out.println("User registered successfully");
+            System.out.println("User registered successfully!");
         } else {
-            System.out.println("Registration failed");
+            System.out.println("Registration failed.");
         }
     }
 
-    private static void logInAsUser(Scanner scanner, UserService userService,
-            MembershipService membershipService, WorkoutClassService workoutService) {
-        System.out.print("Enter username: ");
+    private static void logInAsUser(Scanner scanner, UserService userService, MembershipService membershipService,
+            WorkoutClassService workoutService) {
+        System.out.print("Username: ");
         String username = scanner.nextLine();
-
-        System.out.print("Enter password: ");
+        System.out.print("Password: ");
         String password = scanner.nextLine();
 
         User user = userService.loginUser(username, password);
-
         if (user != null) {
-            System.out.println("Login successful. Welcome " + user.getUsername());
+            System.out.println("Welcome " + user.getUsername());
 
             switch (user.getRole().toLowerCase()) {
                 case "admin":
-                    showAdminMenu(scanner);
+                    showAdminMenu(scanner, userService);
                     break;
                 case "trainer":
-                    showTrainerMenu(scanner);
+                    System.out.println("Trainer menu (to be implemented)");
                     break;
                 case "member":
-                    showMemberMenu(scanner);
+                    System.out.println("Member menu (to be implemented)");
                     break;
                 default:
-                    System.out.println("Unknown role");
+                    System.out.println("Unknown role.");
             }
         } else {
-            System.out.println("Login failed");
+            System.out.println("Login failed.");
         }
     }
 
-    private static void showAdminMenu(Scanner scanner) {
-        System.out.println("\nAdmin Menu:");
-        System.out.println("1. View users");
-        System.out.println("2. View revenue");
-        System.out.println("3. Delete a user");
-        System.out.println("4. Back");
-        int adminChoice = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Option selected: " + adminChoice + " (to do)");
-    }
+    private static void showAdminMenu(Scanner scanner, UserService userService) {
+        int option;
+        do {
+            System.out.println("\n--- Admin Menu ---");
+            System.out.println("1. View All Users");
+            System.out.println("2. Delete a User by Username");
+            System.out.println("3. Go Back");
+            System.out.print("Your choice: ");
 
-    private static void showTrainerMenu(Scanner scanner) {
-        System.out.println("\nTrainer Menu:");
-        System.out.println("1. Add a workout class");
-        System.out.println("2. View my classes");
-        System.out.println("3. Delete a class");
-        System.out.println("4. Back");
-        int trainerChoice = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Option selected: " + trainerChoice + " (to do)");
-    }
+            while (!scanner.hasNextInt()) {
+                System.out.println("Invalid input.");
+                scanner.next();
+            }
 
-    private static void showMemberMenu(Scanner scanner) {
-        System.out.println("\nMember Menu:");
-        System.out.println("1. View available classes");
-        System.out.println("2. Purchase membership");
-        System.out.println("3. View membership expenses");
-        System.out.println("4. Back");
-        int memberChoice = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Option selected: " + memberChoice + " (to do)");
+            option = scanner.nextInt();
+            scanner.nextLine(); // consume newline
+
+            switch (option) {
+                case 1:
+                    List<User> users = userService.getAllUsers();
+                    for (User u : users) {
+                        System.out.println(
+                                u.getId() + " | " + u.getUsername() + " | " + u.getRole() + " | " + u.getEmail());
+                    }
+                    break;
+                case 2:
+                    System.out.print("Enter username to delete: ");
+                    String userToDelete = scanner.nextLine();
+                    boolean deleted = userService.deleteUserByUsername(userToDelete);
+                    if (deleted) {
+                        System.out.println("User deleted.");
+                    } else {
+                        System.out.println("User not found or error.");
+                    }
+                    break;
+                case 3:
+                    System.out.println("Returning to main menu...");
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+            }
+
+        } while (option != 3);
     }
 }

@@ -2,19 +2,19 @@ package org.keyin.user;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-public class UserService {
+import java.util.List;
 
+public class UserService {
     private UserDao userDao = new UserDao();
 
-    public boolean registerUser(String username, String password, String role, String email, String phoneNumber,
+    public boolean registerUser(String username, String password, String role, String email, String phone,
             String address) {
         try {
-            String hashedPw = BCrypt.hashpw(password, BCrypt.gensalt());
-            User user = new User(username, hashedPw, role, email, phoneNumber, address);
+            String hash = BCrypt.hashpw(password, BCrypt.gensalt());
+            User user = new User(username, hash, role, email, phone, address);
             userDao.saveUser(user);
             return true;
         } catch (Exception e) {
-            System.out.println("Error registering user.");
             return false;
         }
     }
@@ -26,8 +26,16 @@ public class UserService {
                 return user;
             }
         } catch (Exception e) {
-            System.out.println("Login error.");
+            System.out.println("Login failed.");
         }
         return null;
+    }
+
+    public List<User> getAllUsers() {
+        return userDao.getAllUsers();
+    }
+
+    public boolean deleteUserByUsername(String username) {
+        return userDao.deleteUserByUsername(username);
     }
 }
