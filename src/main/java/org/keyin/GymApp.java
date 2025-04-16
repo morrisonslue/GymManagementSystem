@@ -5,17 +5,13 @@ import org.keyin.user.User;
 import org.keyin.user.UserService;
 import org.keyin.workoutclasses.WorkoutClassService;
 
-import java.sql.SQLException;
 import java.util.Scanner;
 
 public class GymApp {
     public static void main(String[] args) {
-        // Initialize services
         UserService userService = new UserService();
         MembershipService membershipService = new MembershipService();
         WorkoutClassService workoutService = new WorkoutClassService();
-
-        // Scanner for user input
         Scanner scanner = new Scanner(System.in);
         int choice;
 
@@ -27,12 +23,12 @@ public class GymApp {
             System.out.print("Enter your choice: ");
 
             while (!scanner.hasNextInt()) {
-                System.out.println("Invalid input! Please enter a number.");
+                System.out.println("Invalid input. Enter a number: ");
                 scanner.next();
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -45,7 +41,7 @@ public class GymApp {
                     System.out.println("Exiting program...");
                     break;
                 default:
-                    System.out.println("Invalid choice.");
+                    System.out.println("Invalid choice");
             }
 
         } while (choice != 3);
@@ -75,14 +71,14 @@ public class GymApp {
         boolean success = userService.registerUser(username, password, role, email, phoneNumber, address);
 
         if (success) {
-            System.out.println("User registered successfully!");
+            System.out.println("User registered successfully");
         } else {
-            System.out.println("Registration failed.");
+            System.out.println("Registration failed");
         }
     }
 
-    private static void logInAsUser(Scanner scanner, UserService userService, MembershipService membershipService,
-            WorkoutClassService workoutService) {
+    private static void logInAsUser(Scanner scanner, UserService userService,
+            MembershipService membershipService, WorkoutClassService workoutService) {
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
 
@@ -96,34 +92,52 @@ public class GymApp {
 
             switch (user.getRole().toLowerCase()) {
                 case "admin":
-                    showAdminMenu(scanner, user, userService, membershipService, workoutService);
+                    showAdminMenu(scanner);
                     break;
                 case "trainer":
-                    showTrainerMenu(scanner, user, userService, workoutService);
+                    showTrainerMenu(scanner);
                     break;
                 case "member":
-                    showMemberMenu(scanner, user, userService, membershipService);
+                    showMemberMenu(scanner);
                     break;
                 default:
-                    System.out.println("Unknown role.");
+                    System.out.println("Unknown role");
             }
         } else {
-            System.out.println("Login failed.");
+            System.out.println("Login failed");
         }
     }
 
-    private static void showMemberMenu(Scanner scanner, User user, UserService userService,
-            MembershipService membershipService) {
-        System.out.println("Member menu (to be implemented)");
+    private static void showAdminMenu(Scanner scanner) {
+        System.out.println("\nAdmin Menu:");
+        System.out.println("1. View users");
+        System.out.println("2. View revenue");
+        System.out.println("3. Delete a user");
+        System.out.println("4. Back");
+        int adminChoice = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Option selected: " + adminChoice + " (to do)");
     }
 
-    private static void showTrainerMenu(Scanner scanner, User user, UserService userService,
-            WorkoutClassService workoutService) {
-        System.out.println("Trainer menu (to be implemented)");
+    private static void showTrainerMenu(Scanner scanner) {
+        System.out.println("\nTrainer Menu:");
+        System.out.println("1. Add a workout class");
+        System.out.println("2. View my classes");
+        System.out.println("3. Delete a class");
+        System.out.println("4. Back");
+        int trainerChoice = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Option selected: " + trainerChoice + " (to do)");
     }
 
-    private static void showAdminMenu(Scanner scanner, User user, UserService userService,
-            MembershipService membershipService, WorkoutClassService workoutService) {
-        System.out.println("Admin menu (to be implemented)");
+    private static void showMemberMenu(Scanner scanner) {
+        System.out.println("\nMember Menu:");
+        System.out.println("1. View available classes");
+        System.out.println("2. Purchase membership");
+        System.out.println("3. View membership expenses");
+        System.out.println("4. Back");
+        int memberChoice = scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Option selected: " + memberChoice + " (to do)");
     }
 }
