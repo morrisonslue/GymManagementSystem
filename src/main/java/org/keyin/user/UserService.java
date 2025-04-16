@@ -6,10 +6,11 @@ public class UserService {
 
     private UserDao userDao = new UserDao();
 
-    public boolean registerUser(String username, String password, String role) {
+    public boolean registerUser(String username, String password, String role, String email, String phoneNumber,
+            String address) {
         try {
             String hashedPw = BCrypt.hashpw(password, BCrypt.gensalt());
-            User user = new User(0, username, hashedPw, role);
+            User user = new User(username, hashedPw, role, email, phoneNumber, address);
             userDao.saveUser(user);
             return true;
         } catch (Exception e) {
@@ -30,4 +31,3 @@ public class UserService {
         return null;
     }
 }
-
