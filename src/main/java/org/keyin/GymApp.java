@@ -137,7 +137,8 @@ public class GymApp {
             System.out.println("3. View My Classes");
             System.out.println("4. Update Workout Class");
             System.out.println("5. Purchase Membership");
-            System.out.println("6. Back to Main Menu");
+            System.out.println("6. View Total Membership Expenses");
+            System.out.println("7. Back to Main Menu");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -213,6 +214,15 @@ public class GymApp {
                     break;
 
                 case 6:
+                    try {
+                        double total = membershipService.getMemberExpenses(trainer.getId());
+                        System.out.println("Your total membership expenses: $" + total);
+                    } catch (SQLException e) {
+                        System.out.println("There was a problem getting expenses");
+                    }
+                    break;
+
+                case 7:
                     System.out.println("Going back to main menu");
                     break;
 
@@ -220,7 +230,7 @@ public class GymApp {
                     System.out.println("Invalid option");
             }
 
-        } while (choice != 6);
+        } while (choice != 7);
     }
 
     // member menu
@@ -265,14 +275,14 @@ public class GymApp {
                 case 3:
                     try {
                         double total = membershipService.getMemberExpenses(member.getId());
-                        System.out.println("Your total membership expenses: $" + total);
+                        System.out.println("Total membership expenses: $" + total);
                     } catch (SQLException e) {
                         System.out.println("Error fetching expenses");
                     }
                     break;
 
                 case 4:
-                    System.out.println("Returning to main menu.");
+                    System.out.println("Going back to main menu");
                     break;
 
                 default:
