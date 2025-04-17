@@ -28,7 +28,7 @@ public class GymApp {
 
             while (!scanner.hasNextInt()) {
                 System.out.println("Invalid input. Enter a number.");
-                scanner.next(); // Clear bad input
+                scanner.next();
             }
 
             choice = scanner.nextInt();
@@ -101,7 +101,7 @@ public class GymApp {
                     showAdminMenu(scanner, user, userService, membershipService, workoutService);
                     break;
                 case "trainer":
-                    showTrainerMenu(scanner, user, workoutService);
+                    showTrainerMenu(scanner, user, workoutService, membershipService);
                     break;
                 case "member":
                     showMemberMenu(scanner, user, membershipService);
@@ -114,14 +114,15 @@ public class GymApp {
         }
     }
 
-    private static void showTrainerMenu(Scanner scanner, User trainer, WorkoutClassService workoutService) {
+    private static void showTrainerMenu(Scanner scanner, User trainer, WorkoutClassService workoutService, MembershipService membershipService) {
         int choice;
         do {
             System.out.println("\n=== Trainer Menu ===");
             System.out.println("1. Add Workout Class");
             System.out.println("2. Delete Workout Class");
             System.out.println("3. View My Classes");
-            System.out.println("4. Back to Main Menu");
+            System.out.println("4. Purchase Membership");
+            System.out.println("5. Back to Main Menu");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -172,6 +173,14 @@ public class GymApp {
                     break;
 
                 case 4:
+                    try {
+                        membershipService.purchaseMembership(scanner, trainer);
+                    } catch (SQLException e) {
+                        System.out.println("Error purchasing membership.");
+                    }
+                    break;
+
+                case 5:
                     System.out.println("Returning to main menu.");
                     break;
 
@@ -179,7 +188,7 @@ public class GymApp {
                     System.out.println("Invalid option.");
             }
 
-        } while (choice != 4);
+        } while (choice != 5);
     }
 
     private static void showMemberMenu(Scanner scanner, User member, MembershipService membershipService) {
@@ -187,7 +196,8 @@ public class GymApp {
         do {
             System.out.println("\n=== Member Menu ===");
             System.out.println("1. View Available Classes");
-            System.out.println("2. Back to Main Menu");
+            System.out.println("2. Purchase Membership");
+            System.out.println("3. Back to Main Menu");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -211,6 +221,14 @@ public class GymApp {
                     break;
 
                 case 2:
+                    try {
+                        membershipService.purchaseMembership(scanner, member);
+                    } catch (SQLException e) {
+                        System.out.println("Error purchasing membership.");
+                    }
+                    break;
+
+                case 3:
                     System.out.println("Returning to main menu.");
                     break;
 
@@ -218,14 +236,71 @@ public class GymApp {
                     System.out.println("Invalid option.");
             }
 
-        } while (choice != 2);
+        } while (choice != 3);
     }
 
     private static void showAdminMenu(Scanner scanner, User admin, UserService userService,
                                       MembershipService membershipService,
                                       WorkoutClassService workoutService) {
-        System.out.println("Admin features coming soon.");
+        int choice;
+        do {
+            System.out.println("\n=== Admin Menu ===");
+            System.out.println("1. View All Users");
+            System.out.println("2. Delete User by Username");
+            System.out.println("3. View All Memberships");
+            System.out.println("4. View Total Revenue");
+            System.out.println("5. Back to Main Menu");
+            System.out.print("Enter choice: ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Enter a number.");
+                scanner.next();
+            }
+
+            choice = scanner.nextInt();
+            scanner.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    List<User> users = userService.getAllUsers();
+                    for (User u : users) {
+                        System.out.println(u.getId() + ": " + u.getUsername() + " | " + u.getEmail() + " | " + u.getPhoneNumber() + " | " + u.getRole());
+                    }
+                    break;
+                case 2:
+                    System.out.print("Enter username to delete: ");
+                    String username = scanner.nextLine();
+                    boolean success = userService.deleteUserByUsername(username);
+                    System.out.println(success ? "User deleted." : "Error deleting user.");
+                    break;
+                case 3:
+                    try {
+                        List<String> memberships = membershipService.getAllMemberships();
+                        for (String m : memberships) {
+                            System.out.println(m);
+                        }
+                    } catch (SQLException e) {
+                        System.out.println("Error fetching memberships.");
+                    }
+                    break;
+                case 4:
+                    try {
+                        double revenue = membershipService.getTotalRevenue();
+                        System.out.println("Total revenue: $" + revenue);
+                    } catch (SQLException e) {
+                        System.out.println("Error fetching revenue.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Returning to main menu.");
+                    break;
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        } while (choice != 5);
     }
 }
+
+
 
 
