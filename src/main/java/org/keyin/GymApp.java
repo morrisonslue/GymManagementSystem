@@ -3,6 +3,7 @@ package org.keyin;
 import org.keyin.memberships.MembershipService;
 import org.keyin.user.User;
 import org.keyin.user.UserService;
+import org.keyin.workoutclasses.WorkoutClass;
 import org.keyin.workoutclasses.WorkoutClassService;
 
 import java.sql.SQLException;
@@ -20,14 +21,14 @@ public class GymApp {
 
         do {
             System.out.println("\n=== Gym Management System ===");
-            System.out.println("1. Add a new user");
-            System.out.println("2. Login as a user");
+            System.out.println("1. Register new user");
+            System.out.println("2. Login as user");
             System.out.println("3. Exit");
             System.out.print("Enter your choice: ");
 
             while (!scanner.hasNextInt()) {
-                System.out.println("Invalid input! Please enter a number.");
-                scanner.next();
+                System.out.println("Invalid input. Enter a number.");
+                scanner.next(); // Clear bad input
             }
 
             choice = scanner.nextInt();
@@ -35,34 +36,40 @@ public class GymApp {
 
             switch (choice) {
                 case 1:
-                    addNewUser(scanner, userService);
+                    registerUser(scanner, userService);
                     break;
                 case 2:
-                    logInAsUser(scanner, userService, membershipService, workoutService);
+                    loginUser(scanner, userService, membershipService, workoutService);
                     break;
                 case 3:
-                    System.out.println("Goodbye!");
+                    System.out.println("Exiting... Goodbye!");
                     break;
                 default:
-                    System.out.println("Invalid option.");
+                    System.out.println("Invalid option. Try again.");
             }
+
         } while (choice != 3);
 
         scanner.close();
     }
 
-    private static void addNewUser(Scanner scanner, UserService userService) {
-        System.out.print("Username: ");
+    private static void registerUser(Scanner scanner, UserService userService) {
+        System.out.print("Enter username: ");
         String username = scanner.nextLine();
-        System.out.print("Password: ");
+
+        System.out.print("Enter password: ");
         String password = scanner.nextLine();
-        System.out.print("Role (Admin/Trainer/Member): ");
+
+        System.out.print("Enter role (Admin/Trainer/Member): ");
         String role = scanner.nextLine();
-        System.out.print("Email: ");
+
+        System.out.print("Enter email: ");
         String email = scanner.nextLine();
-        System.out.print("Phone: ");
+
+        System.out.print("Enter phone number: ");
         String phone = scanner.nextLine();
-        System.out.print("Address: ");
+
+        System.out.print("Enter address: ");
         String address = scanner.nextLine();
 
         boolean success = userService.registerUser(username, password, role, email, phone, address);
@@ -74,77 +81,151 @@ public class GymApp {
         }
     }
 
-    private static void logInAsUser(Scanner scanner, UserService userService, MembershipService membershipService,
-            WorkoutClassService workoutService) {
-        System.out.print("Username: ");
+    private static void loginUser(Scanner scanner, UserService userService,
+                                  MembershipService membershipService,
+                                  WorkoutClassService workoutService) {
+
+        System.out.print("Enter username: ");
         String username = scanner.nextLine();
-        System.out.print("Password: ");
+
+        System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
         User user = userService.loginUser(username, password);
+
         if (user != null) {
-            System.out.println("Welcome " + user.getUsername());
+            System.out.println("Login successful. Welcome " + user.getUsername());
 
             switch (user.getRole().toLowerCase()) {
                 case "admin":
-                    showAdminMenu(scanner, userService);
+                    showAdminMenu(scanner, user, userService, membershipService, workoutService);
                     break;
                 case "trainer":
-                    System.out.println("Trainer menu (to be implemented)");
+                    showTrainerMenu(scanner, user, workoutService);
                     break;
                 case "member":
-                    System.out.println("Member menu (to be implemented)");
+                    showMemberMenu(scanner, user, membershipService);
                     break;
                 default:
-                    System.out.println("Unknown role.");
+                    System.out.println("Unknown role");
             }
         } else {
-            System.out.println("Login failed.");
+            System.out.println("Login failed");
         }
     }
 
-    private static void showAdminMenu(Scanner scanner, UserService userService) {
-        int option;
+    private static void showTrainerMenu(Scanner scanner, User trainer, WorkoutClassService workoutService) {
+        int choice;
         do {
-            System.out.println("\n--- Admin Menu ---");
-            System.out.println("1. View All Users");
-            System.out.println("2. Delete a User by Username");
-            System.out.println("3. Go Back");
-            System.out.print("Your choice: ");
+            System.out.println("\n=== Trainer Menu ===");
+            System.out.println("1. Add Workout Class");
+            System.out.println("2. Delete Workout Class");
+            System.out.println("3. View My Classes");
+            System.out.println("4. Back to Main Menu");
+            System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
-                System.out.println("Invalid input.");
+                System.out.println("Invalid input. Please enter a number.");
                 scanner.next();
             }
 
-            option = scanner.nextInt();
-            scanner.nextLine(); // consume newline
+            choice = scanner.nextInt();
+            scanner.nextLine();
 
-            switch (option) {
+            switch (choice) {
                 case 1:
-                    List<User> users = userService.getAllUsers();
-                    for (User u : users) {
-                        System.out.println(
-                                u.getId() + " | " + u.getUsername() + " | " + u.getRole() + " | " + u.getEmail());
+                    System.out.print("Enter class type: ");
+                    String type = scanner.nextLine();
+                    System.out.print("Enter class description: ");
+                    String desc = scanner.nextLine();
+
+                    WorkoutClass wc = new WorkoutClass(type, desc, trainer.getId());
+                    try {
+                        workoutService.addWorkoutClass(wc);
+                        System.out.println("Class added.");
+                    } catch (SQLException e) {
+                        System.out.println("Error adding class.");
                     }
                     break;
+
                 case 2:
-                    System.out.print("Enter username to delete: ");
-                    String userToDelete = scanner.nextLine();
-                    boolean deleted = userService.deleteUserByUsername(userToDelete);
-                    if (deleted) {
-                        System.out.println("User deleted.");
-                    } else {
-                        System.out.println("User not found or error.");
+                    System.out.print("Enter ID of class to delete: ");
+                    int id = scanner.nextInt();
+                    scanner.nextLine();
+                    try {
+                        workoutService.deleteWorkoutClass(id);
+                        System.out.println("Class deleted.");
+                    } catch (SQLException e) {
+                        System.out.println("Error deleting class.");
                     }
                     break;
+
                 case 3:
-                    System.out.println("Returning to main menu...");
+                    try {
+                        List<WorkoutClass> classes = workoutService.getWorkoutClassesByTrainerId(trainer.getId());
+                        for (WorkoutClass c : classes) {
+                            System.out.println(c);
+                        }
+                    } catch (SQLException e) {
+                        System.out.println("Could not fetch classes.");
+                    }
                     break;
+
+                case 4:
+                    System.out.println("Returning to main menu.");
+                    break;
+
                 default:
                     System.out.println("Invalid option.");
             }
 
-        } while (option != 3);
+        } while (choice != 4);
+    }
+
+    private static void showMemberMenu(Scanner scanner, User member, MembershipService membershipService) {
+        int choice;
+        do {
+            System.out.println("\n=== Member Menu ===");
+            System.out.println("1. View Available Classes");
+            System.out.println("2. Back to Main Menu");
+            System.out.print("Enter choice: ");
+
+            while (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next();
+            }
+
+            choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    try {
+                        List<WorkoutClass> allClasses = new WorkoutClassService().getAllWorkoutClasses();
+                        for (WorkoutClass wc : allClasses) {
+                            System.out.println(wc);
+                        }
+                    } catch (SQLException e) {
+                        System.out.println("Error fetching classes.");
+                    }
+                    break;
+
+                case 2:
+                    System.out.println("Returning to main menu.");
+                    break;
+
+                default:
+                    System.out.println("Invalid option.");
+            }
+
+        } while (choice != 2);
+    }
+
+    private static void showAdminMenu(Scanner scanner, User admin, UserService userService,
+                                      MembershipService membershipService,
+                                      WorkoutClassService workoutService) {
+        System.out.println("Admin features coming soon.");
     }
 }
+
+
