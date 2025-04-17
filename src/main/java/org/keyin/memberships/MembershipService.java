@@ -20,15 +20,15 @@ public class MembershipService {
 
         System.out.print("Enter membership price: ");
         while (!scanner.hasNextDouble()) {
-            System.out.println("Invalid input. Please enter a number.");
+            System.out.println("Invalid input - enter a number.");
             scanner.next();
         }
         double price = scanner.nextDouble();
-        scanner.nextLine(); 
+        scanner.nextLine();
 
         Membership membership = new Membership(type, description, price, user.getId());
         membershipDAO.addMembership(membership);
-        System.out.println("Membership purchased successfully!");
+        System.out.println("Membership purchased");
     }
 
     // view all memberships
