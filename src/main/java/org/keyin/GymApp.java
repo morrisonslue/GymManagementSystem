@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class GymApp {
-    public static void main(String[] args) throws SQLException {
-        // Initialize services
+    public static void main(String[] args) {
         UserService userService = new UserService();
         MembershipService membershipService = new MembershipService();
         WorkoutClassService workoutService = new WorkoutClassService();
@@ -33,7 +32,7 @@ public class GymApp {
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine(); // consume newline
 
             switch (choice) {
                 case 1:
@@ -54,7 +53,6 @@ public class GymApp {
         scanner.close();
     }
 
-    // Registering new users
     private static void registerUser(Scanner scanner, UserService userService) {
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
@@ -83,7 +81,6 @@ public class GymApp {
         }
     }
 
-    // Login and routes to role menu
     private static void loginUser(Scanner scanner, UserService userService,
                                   MembershipService membershipService,
                                   WorkoutClassService workoutService) {
@@ -117,7 +114,6 @@ public class GymApp {
         }
     }
 
-    // Trainer can add, delete, or view their classes
     private static void showTrainerMenu(Scanner scanner, User trainer, WorkoutClassService workoutService) {
         int choice;
         do {
@@ -134,7 +130,7 @@ public class GymApp {
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -186,7 +182,6 @@ public class GymApp {
         } while (choice != 4);
     }
 
-    // So member can view all classes
     private static void showMemberMenu(Scanner scanner, User member, MembershipService membershipService) {
         int choice;
         do {
@@ -201,7 +196,7 @@ public class GymApp {
             }
 
             choice = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -226,11 +221,11 @@ public class GymApp {
         } while (choice != 2);
     }
 
-    // Admin menu MAKE THIS!!!
     private static void showAdminMenu(Scanner scanner, User admin, UserService userService,
                                       MembershipService membershipService,
                                       WorkoutClassService workoutService) {
         System.out.println("Admin features coming soon.");
     }
 }
+
 

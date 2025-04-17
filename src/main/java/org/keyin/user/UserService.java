@@ -2,11 +2,12 @@ package org.keyin.user;
 
 import org.mindrot.jbcrypt.BCrypt;
 
-public class UserService {
+import java.util.List;
 
+public class UserService {
     private UserDao userDao = new UserDao();
 
-    // Register new user 
+    // Register new user with hashing and details
     public boolean registerUser(String username, String password, String role, String email, String phoneNumber, String address) {
         try {
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -19,7 +20,7 @@ public class UserService {
         }
     }
 
-    // Login 
+    // Login user by checking credentials
     public User loginUser(String username, String password) {
         try {
             User user = userDao.getUserByUsername(username);
@@ -31,6 +32,15 @@ public class UserService {
         }
         return null;
     }
-}
 
+    // Admin: fetch all users
+    public List<User> getAllUsers() {
+        return userDao.getAllUsers();
+    }
+
+    // Admin: delete a user by their username
+    public boolean deleteUserByUsername(String username) {
+        return userDao.deleteUserByUsername(username);
+    }
+}
 
