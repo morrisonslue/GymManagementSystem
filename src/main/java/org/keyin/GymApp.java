@@ -21,7 +21,7 @@ public class GymApp {
         Scanner scanner = new Scanner(System.in);
         int choice;
 
-        // loop main menu
+        // main menu loop
         do {
             // show menu
             System.out.println("\n=== Gym Management System ===");
@@ -32,7 +32,7 @@ public class GymApp {
 
             // input check
             while (!scanner.hasNextInt()) {
-                System.out.println("Invalid input. Enter a number.");
+                System.out.println("Invalid input - enter a number");
                 scanner.next();
             }
 
@@ -135,8 +135,9 @@ public class GymApp {
             System.out.println("1. Add Workout Class");
             System.out.println("2. Delete Workout Class");
             System.out.println("3. View My Classes");
-            System.out.println("4. Purchase Membership");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("4. Update Workout Class");
+            System.out.println("5. Purchase Membership");
+            System.out.println("6. Back to Main Menu");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -189,13 +190,29 @@ public class GymApp {
 
                 case 4:
                     try {
+                        System.out.print("Enter ID of class to update: ");
+                        int updateId = scanner.nextInt();
+                        scanner.nextLine();
+                        System.out.print("Enter new class type: ");
+                        String newType = scanner.nextLine();
+                        System.out.print("Enter new description: ");
+                        String newDesc = scanner.nextLine();
+                        workoutService.updateWorkoutClass(updateId, newType, newDesc);
+                        System.out.println("Class updated");
+                    } catch (SQLException e) {
+                        System.out.println("Error updating class");
+                    }
+                    break;
+
+                case 5:
+                    try {
                         membershipService.purchaseMembership(scanner, trainer);
                     } catch (SQLException e) {
                         System.out.println("Error buying membership");
                     }
                     break;
 
-                case 5:
+                case 6:
                     System.out.println("Going back to main menu");
                     break;
 
@@ -203,7 +220,7 @@ public class GymApp {
                     System.out.println("Invalid option");
             }
 
-        } while (choice != 5);
+        } while (choice != 6);
     }
 
     // member menu
@@ -250,7 +267,7 @@ public class GymApp {
                         double total = membershipService.getMemberExpenses(member.getId());
                         System.out.println("Your total membership expenses: $" + total);
                     } catch (SQLException e) {
-                        System.out.println("Error fetching expenses.");
+                        System.out.println("Error fetching expenses");
                     }
                     break;
 
