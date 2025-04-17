@@ -40,4 +40,9 @@ public class MembershipService {
     public double getTotalRevenue() throws SQLException {
         return membershipDAO.getTotalRevenue();
     }
+
+    public double getMemberExpenses(int userId) throws SQLException {
+        return membershipDAO.getTotalExpensesByUserId(userId);
+    }
+
 }

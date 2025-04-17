@@ -213,7 +213,8 @@ public class GymApp {
             System.out.println("\n=== Member Menu ===");
             System.out.println("1. View Available Classes");
             System.out.println("2. Purchase Membership");
-            System.out.println("3. Back to Main Menu");
+            System.out.println("3. View Total Membership Expenses");
+            System.out.println("4. Back to Main Menu");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
@@ -245,14 +246,23 @@ public class GymApp {
                     break;
 
                 case 3:
-                    System.out.println("Going back to main menu");
+                    try {
+                        double total = membershipService.getMemberExpenses(member.getId());
+                        System.out.println("Your total membership expenses: $" + total);
+                    } catch (SQLException e) {
+                        System.out.println("Error fetching expenses.");
+                    }
+                    break;
+
+                case 4:
+                    System.out.println("Returning to main menu.");
                     break;
 
                 default:
                     System.out.println("Invalid option");
             }
 
-        } while (choice != 3);
+        } while (choice != 4);
     }
 
     // admin menu
@@ -264,13 +274,14 @@ public class GymApp {
             System.out.println("\n=== Admin Menu ===");
             System.out.println("1. View All Users");
             System.out.println("2. Delete User by Username");
-            System.out.println("3. View All Memberships");
-            System.out.println("4. View Total Revenue");
-            System.out.println("5. Back to Main Menu");
+            System.out.println("3. View Total Membership Expenses");
+            System.out.println("4. View All Memberships");
+            System.out.println("5. View Total Revenue");
+            System.out.println("6. Back to Main Menu");
             System.out.print("Enter choice: ");
 
             while (!scanner.hasNextInt()) {
-                System.out.println("Invalid input. Enter a number:");
+                System.out.println("Invalid input - enter a number:");
                 scanner.next();
             }
 
